@@ -5,7 +5,6 @@
 crash.log
 
 # Local override files
-*.tfvars
 *.tfvars.json
 
 # Editor / OS files
