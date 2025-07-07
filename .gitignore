@@ -1,0 +1,29 @@
+# Terraform working directories
+.terraform/
+*.tfstate
+*.tfstate.backup
+crash.log
+
+# Local override files
+*.tfvars
+*.tfvars.json
+
+# Editor / OS files
+*.swp
+*.DS_Store
+.idea/
+.vscode/
+
+# Archives / binaries
+*.zip
+*.tar.gz
+*.exe
+*.out
+*.bin
+
+# AWS CLI install file (manual downloaded ZIP)
+awscliv2.zip
+
+.terraform/
+*.zip
+terraform-provider-*
