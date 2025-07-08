@@ -1,0 +1,35 @@
+name: DR Terraform Destroy
+
+on:
+  workflow_dispatch:  # 수동 실행용
+
+jobs:
+  terraform-destroy:
+    name: Terraform Destroy on AWS
+    runs-on: ubuntu-latest
+
+    permissions:
+      id-token: write   # OIDC 인증
+      contents: read
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: arn:aws:iam::723165663216:role/github-actions-terraform-role
+          aws-region: ap-northeast-2
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.7.5
+
+      - name: Terraform Init
+        run: terraform -chdir=infra/dr_terraform/envs init
+
+      - name: Terraform Destroy
+        run: terraform -chdir=infra/dr_terraform/envs destroy -auto-approve
+
