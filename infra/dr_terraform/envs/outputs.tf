@@ -14,4 +14,7 @@ output "alb_irsa_role_arn" {
   value = module.irsa_alb.alb_irsa_role_arn
 }
 
+output "rds_endpoint" {
+  value = module.rds.endpoint
+}
 
