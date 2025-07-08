@@ -33,6 +33,16 @@ jobs:
       - name: Terraform Apply
         run: terraform -chdir=infra/dr_terraform/envs apply -auto-approve
 
+      - name: Debug terraform behavior
+        shell: bash
+        run: |
+          echo "▶️ Running terraform version"
+          terraform -version
+
+          echo "▶️ Running output command"
+          terraform -chdir=infra/dr_terraform/envs output -raw rds_endpoint
+
+
       - name: Get RDS endpoint and inject was yaml
         shell: bash
         run: |
