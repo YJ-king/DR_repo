@@ -18,3 +18,7 @@ output "rds_endpoint" {
   value = try(module.rds.rds_endpoint, "unavailable")
 }
 
+output "eks_node_role_arn" {
+  value = module.eks.node_role_arn
+}
+
