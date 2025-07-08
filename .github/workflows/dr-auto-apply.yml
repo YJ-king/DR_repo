@@ -33,29 +33,17 @@ jobs:
       - name: Terraform Apply
         run: terraform -chdir=infra/dr_terraform/envs apply -auto-approve
 
-      - name: Debug terraform behavior
-        shell: bash
-        run: |
-          echo "▶️ Running terraform version"
-          terraform -version
-
-          echo "▶️ Running output command"
-          terraform -chdir=infra/dr_terraform/envs output -raw rds_endpoint
-
-
       - name: Get RDS endpoint and inject was yaml
         shell: bash
         run: |
-          echo "🔧 Fetching RDS endpoint to file"
-          terraform -chdir=infra/dr_terraform/envs output -raw rds_endpoint 2>/dev/null > rds.txt
-
-          echo "📄 Raw output:"
-          cat rds.txt
-
-          RDS_ENDPOINT=$(grep -Eo '^[a-z0-9\.-]+\.rds\.amazonaws\.com:3306$' rds.txt || true)
+          echo "🔧 Running terraform and extracting clean value"
+    
+          TF_RAW=$(terraform -chdir=infra/dr_terraform/envs output -raw rds_endpoint 2>/dev/null || echo "")
+    
+          RDS_ENDPOINT=$(echo "$TF_RAW" | grep -Eo '^[a-z0-9.-]+\.rds\.amazonaws\.com:3306$')
 
           if [[ -z "$RDS_ENDPOINT" ]]; then
-            echo "❌ RDS_ENDPOINT could not be extracted cleanly"
+            echo "❌ Failed to extract RDS endpoint from: [$TF_RAW]"
             exit 1
           fi
 
@@ -63,8 +51,8 @@ jobs:
 
           sed -i "s|<RDS_ENDPOINT>|$RDS_ENDPOINT|g" was/was-deployment.yaml
 
-          echo "✅ Injection complete. Result:"
-          grep "$RDS_ENDPOINT" was/was-deployment.yaml || echo "⚠️ Value not found"
+          echo "✅ Injection complete. Verifying:"
+          grep "$RDS_ENDPOINT" was/was-deployment.yaml || echo "⚠️ Not found"
 
 
       - name: Install dependencies (kubectl, awscli, helm)
