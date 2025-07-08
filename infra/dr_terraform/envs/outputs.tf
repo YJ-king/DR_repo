@@ -15,6 +15,6 @@ output "alb_irsa_role_arn" {
 }
 
 output "rds_endpoint" {
-  value = module.rds.endpoint
+  value = try(module.rds.endpoint, "unavailable")
 }
 
