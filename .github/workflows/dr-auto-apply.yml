@@ -71,21 +71,7 @@ jobs:
           echo "NODE_ROLE_ARN=$(terraform -chdir=infra/dr_terraform/envs output -raw eks_node_role_arn)" >> "$GITHUB_ENV"
 
       - name: Generate aws-auth.yaml
-        run: |
-          cat <<EOF > infra/dr_terraform/envs/aws-auth.yaml
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: aws-auth
-  namespace: kube-system
-data:
-  mapRoles: |
-    - rolearn: ${NODE_ROLE_ARN}
-      username: system:node:{{EC2PrivateDNSName}}
-      groups:
-        - system:bootstrappers
-        - system:nodes
-EOF
+        run: bash scripts/gen-aws-auth.sh
         env:
           NODE_ROLE_ARN: ${{ env.NODE_ROLE_ARN }}
 
