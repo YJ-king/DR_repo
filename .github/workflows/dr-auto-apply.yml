@@ -39,10 +39,8 @@ jobs:
           RDS_ENDPOINT=$(terraform -chdir=infra/dr_terraform/envs output -raw rds_endpoint 2>/dev/null | head -n 1 | tr -d '\r')
           echo "📌 Final resolved RDS: $RDS_ENDPOINT"
     
-    # 치환
           sed -i "s|<RDS_ENDPOINT>|$RDS_ENDPOINT|g" was/was-deployment.yaml
 
-    # 검증
           echo "✅ Replacement result:"
           grep "$(echo "$RDS_ENDPOINT" | cut -d':' -f1)" was/was-deployment.yaml || echo "⚠️ Not found"
 
