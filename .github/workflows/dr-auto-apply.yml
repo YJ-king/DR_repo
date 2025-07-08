@@ -86,6 +86,9 @@ data:
         - system:bootstrappers
         - system:nodes
 EOF
+        env:
+          NODE_ROLE_ARN: ${{ env.NODE_ROLE_ARN }}
+
 
       - name: Apply aws-auth.yaml
         run: |
