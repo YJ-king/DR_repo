@@ -35,7 +35,8 @@ jobs:
 
       - name: Get RDS endpoint
         run: |
-          echo "RDS_ENDPOINT=$(terraform -chdir=infra/dr_terraform/envs output -raw rds_endpoint)" >> $GITHUB_ENV
+          RDS_ENDPOINT=$(terraform -chdir=infra/dr_terraform/envs output -raw rds_endpoint 2>/dev/null | tr -d '\r')
+    echo "RDS_ENDPOINT=$RDS_ENDPOINT" >> $GITHUB_ENV
 
       - name: Inject RDS endpoint into WAS deployment
         run: |
