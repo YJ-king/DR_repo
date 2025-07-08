@@ -33,15 +33,12 @@ jobs:
       - name: Terraform Apply
         run: terraform -chdir=infra/dr_terraform/envs apply -auto-approve
 
-      - name: Get RDS endpoint
+      - name: Get RDS endpoint and inject was yaml
         run: |
-          terraform -chdir=infra/dr_terraform/envs output -raw rds_endpoint > rds.txt 2>/dev/null
-          RDS_ENDPOINT=$(head -n 1 rds.txt | tr -d '\r')
-          echo "RDS_ENDPOINT=$RDS_ENDPOINT" >> $GITHUB_ENV
-
-      - name: Inject RDS endpoint into WAS deployment
-        run: |
-          sed -i "s|<RDS_ENDPOINT>|${{ env.RDS_ENDPOINT }}|g" was/was-deployment.yaml
+        terraform -chdir=infra/dr_terraform/envs output -raw rds_endpoint > rds.txt 2>/dev/null
+        RDS_ENDPOINT=$(head -n 1 rds.txt | tr -d '\r')
+        echo "Final resolved RDS: $RDS_ENDPOINT"
+        sed -i "s|<RDS_ENDPOINT>|$RDS_ENDPOINT|g" was/was-deployment.yaml
 
       - name: Install dependencies (kubectl, awscli, helm)
         run: |
