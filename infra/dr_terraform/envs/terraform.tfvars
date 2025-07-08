@@ -1,6 +1,6 @@
 region = "ap-northeast-2"
 
-name_prefix = "dr"
+name_prefix = "drb"
 vpc_name    = "dr-vpc"
 vpc_cidr    = "10.0.0.0/16"
 
@@ -26,7 +26,6 @@ db_user           = "admin"
 db_password       = "admin1234"
 db_name           = "petclinic"
 
-eks_cluster_name = "dr-eks-cluster"
+eks_cluster_name = "drb-eks-cluster"
 thumbprint       = "1bbb4ba787ef7707f4ecbc612587ec28805cffc4"
 
-bastion_ami_id = "ami-08943a151bd468f4e"

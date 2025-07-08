@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: apache-config
+data:
+  000-default.conf: |
+    <VirtualHost *:80>
+        ProxyPreserveHost On
+        ProxyPass / http://was-service:8080/
+        ProxyPassReverse / http://was-service:8080/
+    </VirtualHost>

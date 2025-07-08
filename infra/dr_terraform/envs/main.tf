@@ -61,21 +61,4 @@ module "irsa_alb" {
   thumbprint       = var.thumbprint
 }
 
-module "bastion" {
-  source            = "../modules/bastion"
-  name_prefix       = var.name_prefix
-  public_subnet_id  = module.network.public_subnet_ids[0]
-  bastion_sg_id     = module.security.alb_sg_id
-  ec2_key_pair      = var.ec2_key_pair
-  instance_type     = var.bastion_instance_type
-  ubuntu_owner_id   = var.ubuntu_owner_id
-  ubuntu_ami_filter = var.ubuntu_ami_filter
-  bastion_ami_id = var.bastion_ami_id
-  
-startup_script = templatefile("${path.module}/bastion-startup.sh", {
-    cluster_name = module.eks.cluster_name
-    github_repo  = "YJ-king/DR_repo"
-    aws_region   = var.region
-  })
-}
 

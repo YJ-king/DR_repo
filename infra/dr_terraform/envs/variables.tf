@@ -79,30 +79,4 @@ variable "region" {
   type        = string
 }
 
-variable "bastion_instance_type" {
-  type        = string
-  default     = "t3.micro"
-  description = "Instance type for the bastion host"
-}
-
-variable "bastion_startup_script" {
-  type        = string
-  default     = ""
-  description = "Path to bastion startup script"
-}
-
-variable "ubuntu_owner_id" {
-  type        = string
-  default     = "099720109477"
-}
-
-variable "ubuntu_ami_filter" {
-  type    = string
-  default = "ubuntu/images/hvm-ssd/ubuntu-22.04-amd64-server-*"
-}
-
-variable "bastion_ami_id" {
-  type        = string
-  description = "AMI ID to use for bastion host"
-}
 

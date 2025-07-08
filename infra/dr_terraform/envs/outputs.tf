@@ -14,7 +14,4 @@ output "alb_irsa_role_arn" {
   value = module.irsa_alb.alb_irsa_role_arn
 }
 
-output "bastion_public_ip" {
-  value = module.bastion.bastion_public_ip
-}
 
