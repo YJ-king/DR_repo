@@ -73,26 +73,26 @@ jobs:
         run: |
           aws eks update-kubeconfig --region ap-northeast-2 --name drb-eks-cluster
 
-      - name: Get EKS Node Role ARN
-        shell: bash
-        run: |
-          echo "🔧 Running terraform and extracting clean NODE_ROLE_ARN"
-          TF_RAW=$(terraform -chdir=infra/dr_terraform/envs output -raw eks_node_role_arn 2>/dev/null || echo "")
-          NODE_ROLE_ARN=$(echo "$TF_RAW" | grep -Eo '^arn:aws:iam::[0-9]+:role/[A-Za-z0-9+=,.@_-]+$' | head -n 1)
+          # - name: Get EKS Node Role ARN
+          #shell: bash
+          #run: |
+          #echo "🔧 Running terraform and extracting clean NODE_ROLE_ARN"
+          #TF_RAW=$(terraform -chdir=infra/dr_terraform/envs output -raw eks_node_role_arn 2>/dev/null || echo "")
+          #NODE_ROLE_ARN=$(echo "$TF_RAW" | grep -Eo '^arn:aws:iam::[0-9]+:role/[A-Za-z0-9+=,.@_-]+$' | head -n 1)
 
-          if [[ -z "$NODE_ROLE_ARN" ]]; then
-            echo "❌ Failed to extract NODE_ROLE_ARN from: [$TF_RAW]"
-            exit 1
-          fi
+          #if [[ -z "$NODE_ROLE_ARN" ]]; then
+          #echo "❌ Failed to extract NODE_ROLE_ARN from: [$TF_RAW]"
+          #exit 1
+          #fi
 
-          echo "📌 Clean NODE_ROLE_ARN: $NODE_ROLE_ARN"
+          #echo "📌 Clean NODE_ROLE_ARN: $NODE_ROLE_ARN"
 
-          if [[ "$NODE_ROLE_ARN" == arn:* ]]; then
-            echo "NODE_ROLE_ARN=$NODE_ROLE_ARN" >> "$GITHUB_ENV"
-          else
-            echo "❌ NODE_ROLE_ARN format invalid. Skipping env export."
-            exit 1
-          fi
+          #if [[ "$NODE_ROLE_ARN" == arn:* ]]; then
+          #echo "NODE_ROLE_ARN=$NODE_ROLE_ARN" >> "$GITHUB_ENV"
+          #else
+          #echo "❌ NODE_ROLE_ARN format invalid. Skipping env export."
+          #exit 1
+          #fi
 
       - name: Generate aws-auth.yaml
         run: bash scripts/gen-aws-auth.sh
