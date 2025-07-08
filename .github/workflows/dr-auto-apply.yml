@@ -36,14 +36,13 @@ jobs:
       - name: Get RDS endpoint and inject was yaml
         shell: bash
         run: |
-          echo "🔧 Executing terraform output..."
-          export RDS_ENDPOINT=$(terraform -chdir=infra/dr_terraform/envs output -raw rds_endpoint | head -n 1 | tr -d '\r')
-          echo "📌 Final resolved RDS: $RDS_ENDPOINT"
+          RDS_ENDPOINT=$(terraform -chdir=infra/dr_terraform/envs output -raw rds_endpoint | tr -d '\r')
+          echo "📌 Final RDS: $RDS_ENDPOINT"
 
           sed -i "s|<RDS_ENDPOINT>|$RDS_ENDPOINT|g" was/was-deployment.yaml
 
-          echo "✅ Replacement result:"
-          grep "$(echo "$RDS_ENDPOINT" | cut -d':' -f1)" was/was-deployment.yaml || echo "⚠️ Not found"
+          echo "✅ Injection complete. Check result:"
+          grep "$RDS_ENDPOINT" was/was-deployment.yaml || echo "⚠️ Value not found"
 
       - name: Install dependencies (kubectl, awscli, helm)
         run: |
