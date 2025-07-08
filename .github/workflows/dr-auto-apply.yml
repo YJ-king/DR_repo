@@ -35,14 +35,7 @@ jobs:
 
       - name: Get RDS endpoint
         run: |
-          RDS_ENDPOINT=$(terraform -chdir=infra/dr_terraform/envs output -raw rds_endpoint 2>/dev/null || echo "")
-          if [[ "$RDS_ENDPOINT" != *unavailable* && -n "$RDS_ENDPOINT" ]]; then
-            echo "RDS_ENDPOINT=$RDS_ENDPOINT" >> "$GITHUB_ENV"
-          else
-            echo "RDS_ENDPOINT not available, skipping export"
-          fi
-
-          echo "DEBUG RDS_ENDPOINT value: $RDS_ENDPOINT"
+          echo "RDS_ENDPOINT=$(terraform -chdir=infra/dr_terraform/envs output -raw rds_endpoint)" >> $GITHUB_ENV
 
       - name: Inject RDS endpoint into WAS deployment
         run: |
