@@ -76,7 +76,12 @@ jobs:
       - name: Get EKS Node Role ARN
         id: node_role
         run: |
-          echo "NODE_ROLE_ARN=$(terraform -chdir=infra/dr_terraform/envs output -raw eks_node_role_arn)" >> "$GITHUB_ENV"
+          EKS_NODE_ROLE_ARN=$(terraform -chdir=infra/dr_terraform/envs output -raw eks_node_role_arn 2>/dev/null || echo "")
+          if [[ -n "$EKS_NODE_ROLE_ARN" ]]; then
+            echo "NODE_ROLE_ARN=$EKS_NODE_ROLE_ARN" >> "$GITHUB_ENV"
+          else
+            echo "EKS_NODE_ROLE_ARN not found or terraform output failed"
+          fi
 
       - name: Generate aws-auth.yaml
         run: bash scripts/gen-aws-auth.sh
