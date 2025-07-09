@@ -126,6 +126,7 @@ jobs:
           echo "role_arn=$ROLE_ARN" >> "$GITHUB_OUTPUT"
 
       - name: Install ALB Controller with Helm
+        id: get_role
         shell: bash
         run: |
           echo "📌 Installing ALB Controller with Helm"
