@@ -109,6 +109,7 @@ jobs:
           kubectl apply -f https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/main/helm/aws-load-balancer-controller/crds/crds.yaml
 
       - name: Extract ALB IRSA Role ARN
+        id: get_role
         run: |
           echo "🔍 Extracting ALB IRSA Role ARN"
 
