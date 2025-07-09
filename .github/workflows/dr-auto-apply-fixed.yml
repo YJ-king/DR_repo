@@ -128,6 +128,9 @@ jobs:
       - name: Create imagePullSecret for GCP Artifact Registry
         run: |
           echo "${{ secrets.GCP_AR_KEY_JSON }}" > key.json
+
+          kubectl delete secret regcred -n default --ignore-not-found
+
           kubectl create secret docker-registry regcred \
           --docker-server=asia-northeast3-docker.pkg.dev \
           --docker-username=_json_key \
