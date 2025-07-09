@@ -78,25 +78,18 @@ jobs:
         run: |
           echo "🔧 Running terraform and extracting clean NODE_ROLE_ARN"
 
-          echo "📍 Init before output (to ensure backend is loaded)"
-          terraform -chdir=infra/dr_terraform/envs init -input=false
+          TF_RAW=$(terraform -chdir=infra/dr_terraform/envs output -raw eks_node_role_arn 2>/dev/null || echo "")
 
-          echo "📤 Running terraform output (raw)"
-          TF_RAW=$(terraform -chdir=infra/dr_terraform/envs output -raw eks_node_role_arn 2>&1)
+          NODE_ROLE_ARN=$(echo "$TF_RAW" | grep -Eo '^arn:aws:iam::[0-9]+:role/[A-Za-z0-9+=,.@_-]+$' | head -n 1)
 
-          echo "🧪 Full output: [$TF_RAW]"
-
-          TF_CLEAN=$(echo "$TF_RAW" | grep -Eo '^arn:aws:iam::[0-9]+:role/[A-Za-z0-9+=,.@_-]+$' | head -n 1)
-
-          echo "📌 Extracted clean NODE_ROLE_ARN: [$TF_CLEAN]"
-
-          if [[ -z "$TF_CLEAN" ]]; then
-            echo "❌ Failed to extract NODE_ROLE_ARN from TF_RAW"
+          if [[ -z "$NODE_ROLE_ARN" ]]; then
+            echo "❌ Failed to extract NODE_ROLE_ARN from: [$TF_RAW]"
             exit 1
           fi
 
-          echo "NODE_ROLE_ARN=$TF_CLEAN" >> "$GITHUB_ENV"
-        
+          echo "📌 Clean NODE_ROLE_ARN: $NODE_ROLE_ARN"
+          echo "NODE_ROLE_ARN=$NODE_ROLE_ARN" >> "$GITHUB_ENV"
+
 
       - name: Generate aws-auth.yaml
         run: bash scripts/gen-aws-auth.sh
