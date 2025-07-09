@@ -110,7 +110,19 @@ jobs:
 
       - name: Extract ALB IRSA Role ARN
         run: |
-          ROLE_ARN=$(terraform -chdir=infra/dr_terraform/envs output -raw alb_irsa_role_arn)
+          echo "🔍 Extracting ALB IRSA Role ARN"
+
+          TF_RAW=$(terraform -chdir=infra/dr_terraform/envs output alb_irsa_role_arn 2>/dev/null || echo "")
+          echo "🧪 Raw: [$TF_RAW]"
+
+          ROLE_ARN=$(echo "$TF_RAW" | tr -d '"' | grep -Eo '^arn:aws:iam::[0-9]+:role/[A-Za-z0-9+=,.@_-]+$' | head -n 1)
+          echo "📌 Cleaned: [$ROLE_ARN]"
+
+          if [[ -z "$ROLE_ARN" ]]; then
+            echo "❌ ROLE_ARN not found"
+            exit 1
+          fi
+
           echo "role_arn=$ROLE_ARN" >> "$GITHUB_OUTPUT"
 
       - name: Install ALB Controller with Helm
