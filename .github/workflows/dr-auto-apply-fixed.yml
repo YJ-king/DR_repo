@@ -78,7 +78,7 @@ jobs:
         run: |
           echo "🔧 Running terraform and extracting clean NODE_ROLE_ARN"
 
-          TF_RAW=$(terraform -chdir=infra/dr_terraform/envs output -raw eks_node_role_arn 2>/dev/null || echo "")
+          TF_RAW=$(terraform -chdir=infra/dr_terraform/envs output eks_node_role_arn 2>/dev/null || echo "")
 
           NODE_ROLE_ARN=$(echo "$TF_RAW" | grep -Eo '^arn:aws:iam::[0-9]+:role/[A-Za-z0-9+=,.@_-]+$' | head -n 1)
 
