@@ -128,10 +128,10 @@ jobs:
       - name: Install ALB Controller with Helm
         id: get_role
         shell: bash
+        env:
+          ROLE_ARN: ${{ steps.get_role.outputs.role_arn }}
         run: |
           echo "📌 Installing ALB Controller with Helm"
-
-          ROLE_ARN="${{ steps.get_role.outputs.role_arn }}"
     
           if [[ -z "$ROLE_ARN" ]]; then
             echo "❌ ROLE_ARN is missing! Aborting Helm install."
