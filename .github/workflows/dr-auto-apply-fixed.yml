@@ -106,7 +106,7 @@ jobs:
 
       - name: Install ALB Controller CRDs
         run: |
-          kubectl apply -f https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/v2.7.1/docs/install/crds.yaml
+          kubectl apply -f https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/main/helm/aws-load-balancer-controller/crds/crds.yaml
 
       - name: Install ALB Controller with Helm
         run: |
