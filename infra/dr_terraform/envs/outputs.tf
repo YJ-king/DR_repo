@@ -19,6 +19,6 @@ output "rds_endpoint" {
 }
 
 output "eks_node_role_arn" {
-  value = module.eks.node_role_arn
+  value = module.iam.eks_node_role_arn
 }
 
