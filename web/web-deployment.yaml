@@ -26,3 +26,5 @@ spec:
       - name: apache-config-volume
         configMap:
           name: apache-config
+      imagePullSecrets:
+      - name: regcred
