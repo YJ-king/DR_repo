@@ -87,6 +87,10 @@ jobs:
 
           echo "📌 Clean NODE_ROLE_ARN: $NODE_ROLE_ARN"
 
+          echo "🧪 TF_RAW: [$TF_RAW]"
+          echo "🧪 grep result: $(echo "$TF_RAW" | grep -Eo '^arn:aws:iam::[0-9]+:role/[A-Za-z0-9+=,.@_-]+$')"
+
+
           if [[ "$NODE_ROLE_ARN" == arn:* ]]; then
           echo "NODE_ROLE_ARN=$NODE_ROLE_ARN" >> "$GITHUB_ENV"
             else
