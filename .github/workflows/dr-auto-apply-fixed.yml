@@ -128,12 +128,20 @@ jobs:
       - name: Install ALB Controller with Helm
         shell: bash
         run: |
+          echo "📌 Installing ALB Controller with Helm"
+
           ROLE_ARN="${{ steps.get_role.outputs.role_arn }}"
     
           if [[ -z "$ROLE_ARN" ]]; then
-            echo "❌ ALB IRSA Role ARN is missing!"
+            echo "❌ ROLE_ARN is missing! Aborting Helm install."
             exit 1
           fi
+
+          VPC_ID=$(aws eks describe-cluster \
+            --name drb-eks-cluster \
+            --region ap-northeast-2 \
+            --query "cluster.resourcesVpcConfig.vpcId" \
+            --output text)
 
           helm repo add eks https://aws.github.io/eks-charts
           helm repo update
@@ -143,11 +151,12 @@ jobs:
             --set clusterName=drb-eks-cluster \
             --set serviceAccount.create=true \
             --set serviceAccount.name=aws-load-balancer-controller \
-            --set serviceAccount.annotations."eks\.amazonaws\.com/role-arn"=$ROLE_ARN \
+            --set serviceAccount.annotations."eks\.amazonaws\.com/role-arn"="$ROLE_ARN" \
             --set region=ap-northeast-2 \
-            --set vpcId=$(aws eks describe-cluster --name drb-eks-cluster --region ap-northeast-2 --query "cluster.resourcesVpcConfig.vpcId" --output text) \
+            --set vpcId="$VPC_ID" \
             --set image.repository=602401143452.dkr.ecr.ap-northeast-2.amazonaws.com/amazon/aws-load-balancer-controller
-      
+
+
       - name: Wait for ALB Controller Ready
         run: kubectl rollout status deployment/aws-load-balancer-controller -n kube-system
 
