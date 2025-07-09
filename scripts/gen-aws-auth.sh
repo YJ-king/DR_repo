@@ -12,5 +12,10 @@ data:
       groups:
         - system:bootstrappers
         - system:nodes
+  mapUsers: |
+    - userarn: arn:aws:iam::723165663216:user/kdt005
+      username: kdt005
+      groups:
+        - system:masters
 EOF
 
