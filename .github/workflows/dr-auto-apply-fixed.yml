@@ -135,7 +135,7 @@ jobs:
             --set clusterName=drb-eks-cluster \
             --set serviceAccount.create=true \
             --set serviceAccount.name=aws-load-balancer-controller \
-            --set serviceAccount.annotations."eks\.amazonaws\.com/role-arn"=${{ steps.get_role.outputs.role_arn }}
+            --set serviceAccount.annotations."eks\.amazonaws\.com/role-arn"=${{ steps.get_role.outputs.role_arn }} \
             --set region=ap-northeast-2 \
             --set vpcId=$(aws eks describe-cluster --name drb-eks-cluster --region ap-northeast-2 --query "cluster.resourcesVpcConfig.vpcId" --output text) \
             --set image.repository=602401143452.dkr.ecr.ap-northeast-2.amazonaws.com/amazon/aws-load-balancer-controller
