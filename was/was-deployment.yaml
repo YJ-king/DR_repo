@@ -21,13 +21,15 @@ spec:
         ports:
         - containerPort: 8080
         env:
-        - name: JAVA_OPTS
-          value: "-Dspring.config.location=/config/application.properties"
         - name: DB_PASSWORD
           valueFrom:
             secretKeyRef:
               name: db-secret
               key: password
+        - name: JAVA_OPTS
+          value: "-Dspring.config.location=file:/config/application.properties"
+           
+
         volumeMounts:
         - name: config-volume
           mountPath: /config/application.properties
