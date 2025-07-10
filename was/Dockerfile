@@ -11,7 +11,7 @@ RUN mvn clean package -DskipTests -PMySQL
 FROM tomcat:9.0.105-jdk11
 
 RUN apt update && \
-    apt install -y bash mysql-client && \
+    apt install -y bash mysql-client gettext && \
     rm -rf /var/lib/apt/lists/*
 
 RUN rm -rf /usr/local/tomcat/webapps/*
