@@ -17,7 +17,7 @@ spec:
 
       containers:
       - name: was
-        image: asia-northeast3-docker.pkg.dev/kdt1-finalproject/yj-repo/yj-was:was-20250710-05
+        image: asia-northeast3-docker.pkg.dev/kdt1-finalproject/yj-repo/yj-was:was-dr-01
         ports:
         - containerPort: 8080
         env:
