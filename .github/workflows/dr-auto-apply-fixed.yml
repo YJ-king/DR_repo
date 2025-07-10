@@ -47,6 +47,12 @@ jobs:
           # Helm
           curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
 
+      - name: Authenticate Docker to Artifact Registry
+        run: |
+          echo '${{ secrets.GCP_AR_KEY_JSON }}' > key.json
+          gcloud auth activate-service-account --key-file=key.json
+          gcloud auth configure-docker asia-northeast3-docker.pkg.dev --quiet
+
       - name: Connect to EKS
         run: |
           aws eks update-kubeconfig --region ap-northeast-2 --name drb-eks-cluster
