@@ -21,9 +21,24 @@ spec:
         ports:
         - containerPort: 8080
         env:
-        - name: DB_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: db-secret
-              key: password
-
+          env:
+          - name: DB_HOST
+            valueFrom:
+              secretKeyRef:
+                name: db-secret
+                key: host
+          - name: DB_NAME
+            valueFrom:
+              secretKeyRef:
+                name: db-secret
+                key: name
+          - name: DB_USER
+            valueFrom:
+              secretKeyRef:
+                name: db-secret
+                key: user
+          - name: DB_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: db-secret
+                key: password

@@ -163,10 +163,15 @@ jobs:
           DB_HOST=$(terraform -chdir=infra/dr_terraform/envs output -raw rds_endpoint | grep -Eo '^[a-z0-9.-]+\.rds\.amazonaws\.com:3306')
           DB_NAME="petclinic"
           DB_USER="petuser"
-          DB_PASSWORD=$(kubectl get secret db-secret -o jsonpath="{.data.password}" | base64 -d)
+          DB_PASSWORD=$(terraform -chdir=infra/dr_terraform/envs output -raw db_password)
 
-          export DB_HOST DB_NAME DB_USER DB_PASSWORD
-          envsubst < was/application.properties.tpl > was/petclinic_btc/src/main/resources/application.properties
+          kubectl delete secret db-secret --ignore-not-found
+
+          kubectl create secret generic db-secret \
+          --from-literal=host="$DB_HOST" \
+          --from-literal=name="$DB_NAME" \
+          --from-literal=user="$DB_USER" \
+          --from-literal=password="$DB_PASSWORD"
 
       - name: Maven Build for WAR
         run: |
