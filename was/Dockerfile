@@ -22,10 +22,10 @@ COPY application.properties.tpl /application.properties.tpl
 COPY data-access.properties.tpl /data-access.properties.tpl
 COPY datasource-config.xml.tpl /application/datasource-config.xml.tpl
 
-RUN envsubst < /application.properties.tpl > /app/application.properties && \
+RUN mkdir -p /app && \
+    envsubst < /application.properties.tpl > /app/application.properties && \
     envsubst < /data-access.properties.tpl > /app/data-access.properties && \
     envsubst < /application/datasource-config.xml.tpl > /app/datasource-config.xml && \
     cp /app/application.properties /usr/local/tomcat/webapps/ROOT/WEB-INF/classes/application.properties && \
     cp /app/data-access.properties /usr/local/tomcat/webapps/ROOT/WEB-INF/classes/spring/data-access.properties && \
     cp /app/datasource-config.xml /usr/local/tomcat/webapps/ROOT/WEB-INF/classes/spring/datasource-config.xml
-
