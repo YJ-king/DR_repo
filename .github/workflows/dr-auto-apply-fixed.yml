@@ -152,7 +152,7 @@ jobs:
           --docker-email=ci@github.com \
           -n default
 
-      - name: Generate data-access.properties using RDS Endpoint
+      - name: Generate application.properties for Petclinic WAR
         run: |
           DB_HOST=$(terraform -chdir=infra/dr_terraform/envs output -raw rds_endpoint | grep -Eo '^[a-z0-9.-]+\.rds\.amazonaws\.com:3306')
           DB_NAME="petclinic"
@@ -160,21 +160,23 @@ jobs:
           DB_PASSWORD=$(kubectl get secret db-secret -o jsonpath="{.data.password}" | base64 -d)
 
           export DB_HOST DB_NAME DB_USER DB_PASSWORD
-          envsubst < was/data-access.properties.tpl > was/data-access.properties
+          envsubst < was/application.properties.tpl > was/petclinic_btc/src/main/resources/application.properties
 
-      - name: Create or update ConfigMap for WAS DB Config
+      - name: Maven Build for WAR
         run: |
-          kubectl create configmap was-db-config \
-          --from-file=data-access.properties=was/data-access.properties \
-          -o yaml --dry-run=client | kubectl apply -f -
+          cd was/petclinic_btc
+          ./mvnw clean package -DskipTests -PMySQL
+
+      - name: Build Docker image for WAS
+        run: |
+          docker build -t asia-northeast3-docker.pkg.dev/kdt1-finalproject/yj-repo/yj-was:was-dr-01 ./was
+
+      - name: Push Docker image to Artifact Registry
+        run: |
+          docker push asia-northeast3-docker.pkg.dev/kdt1-finalproject/yj-repo/yj-was:was-dr-01
 
       - name: Deploy Web & WAS YAMLs
         run: |
           kubectl apply -f web/
           kubectl apply -f was/
-
-      - name: Restart WAS Deployment
-        run: |
-          kubectl rollout restart deployment was-deployment
- 
 

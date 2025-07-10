@@ -27,12 +27,3 @@ spec:
               name: db-secret
               key: password
 
-        volumeMounts:
-        - name: db-config
-          mountPath: /usr/local/tomcat/webapps/ROOT/WEB-INF/classes/spring/data-access.properties
-          subPath: data-access.properties
-
-      volumes:
-      - name: db-config
-        configMap:
-          name: was-db-config
