@@ -23,24 +23,19 @@ spec:
         command: ["/bin/bash", "-c"]
         args:
           - |
-            # 2. 압축 해제될 때까지 대기 (최대 10초까지 기다림)
-            for i in {1..10}; do
-              if [ -f /usr/local/tomcat/webapps/ROOT/WEB-INF/classes/application.properties ]; then
-                echo "📦 ROOT.war 압축 해제 완료"
-                break
-              fi
-              echo "⏳ ROOT.war 압축 대기중... ($i)"
-              sleep 1
+            echo "🌐 DB_HOST=${DB_HOST}"
+
+            for i in {1..30}; do
+            if [ -d /usr/local/tomcat/webapps/ROOT/WEB-INF/classes ]; then
+              echo "📦 ROOT.war 압축 해제 완료"
+              break
+            fi
+            echo "⏳ ROOT.war 압축 대기중... ($i)"
+            sleep 1
             done
 
-            # 3. 환경변수 파일로 저장
-            echo "DB_HOST=${DB_HOST}" >> /etc/environment
-            echo "DB_NAME=${DB_NAME}" >> /etc/environment
-            echo "DB_USER=${DB_USER}" >> /etc/environment
-            echo "DB_PASSWORD=${DB_PASSWORD}" >> /etc/environment
-            source /etc/environment
+            mkdir -p /usr/local/tomcat/webapps/ROOT/WEB-INF/classes
 
-            # 4. application.properties 재작성
             cat <<EOF > /usr/local/tomcat/webapps/ROOT/WEB-INF/classes/application.properties
             spring.datasource.url=jdbc:mysql://${DB_HOST}:3306/${DB_NAME}?autoReconnect=true&failOverReadOnly=false&connectTimeout=2000&socketTimeout=3000&maxReconnects=3
             spring.datasource.username=${DB_USER}
@@ -54,16 +49,8 @@ spec:
             spring.datasource.hikari.connection-test-query=SELECT 1
             EOF
 
-            # 5. 설정 파일 내 DB_HOST 값 치환
-            for f in \
-              /usr/local/tomcat/webapps/ROOT/WEB-INF/classes/application.properties \
-              /usr/local/tomcat/webapps/ROOT/WEB-INF/classes/spring/data-access.properties \
-              /usr/local/tomcat/webapps/ROOT/WEB-INF/classes/spring/datasource-config.xml \
-              /usr/local/tomcat/webapps/ROOT/META-INF/maven/org.springframework.samples/spring-framework-petclinic/pom.xml; do
-              [ -f "$f" ] && sed -i "s|\\\$DB_HOST|${DB_HOST}|g" "$f"
-            done
+            echo "✅ 설정파일 생성 완료"
 
-            # 6. catalina.sh run으로 재실행
             exec /usr/local/tomcat/bin/catalina.sh run
 
 
