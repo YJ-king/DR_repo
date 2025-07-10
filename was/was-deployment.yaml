@@ -27,7 +27,7 @@ spec:
               name: db-secret
               key: password
         - name: JAVA_OPTS
-          value: "-Dspring.config.location=file:/config/application.properties"
+          value: "-Dspring.config.additional-location=file:/config/application.properties"
            
 
         volumeMounts:
