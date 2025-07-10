@@ -152,7 +152,7 @@ jobs:
           --docker-email=ci@github.com \
           -n default
 
-      - name: Generate application.properties using RDS Endpoint
+      - name: Generate data-access.properties using RDS Endpoint
         run: |
           DB_HOST=$(terraform -chdir=infra/dr_terraform/envs output -raw rds_endpoint | grep -Eo '^[a-z0-9.-]+\.rds\.amazonaws\.com:3306')
           DB_NAME="petclinic"
@@ -160,12 +160,12 @@ jobs:
           DB_PASSWORD=$(kubectl get secret db-secret -o jsonpath="{.data.password}" | base64 -d)
 
           export DB_HOST DB_NAME DB_USER DB_PASSWORD
-          envsubst < was/application.properties.tpl > was/application.properties
+          envsubst < was/data-access.properties.tpl > was/data-access.properties
 
-      - name: Create or update ConfigMap for WAS
+      - name: Create or update ConfigMap for WAS DB Config
         run: |
-          kubectl create configmap was-config \
-          --from-file=application.properties=was/application.properties \
+          kubectl create configmap was-db-config \
+          --from-file=data-access.properties=was/data-access.properties \
           -o yaml --dry-run=client | kubectl apply -f -
 
       - name: Deploy Web & WAS YAMLs
@@ -176,5 +176,5 @@ jobs:
       - name: Restart WAS Deployment
         run: |
           kubectl rollout restart deployment was-deployment
-
+ 
 

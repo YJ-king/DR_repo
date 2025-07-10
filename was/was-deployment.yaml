@@ -17,7 +17,7 @@ spec:
 
       containers:
       - name: was
-        image: asia-northeast3-docker.pkg.dev/kdt1-finalproject/yj-repo/yj-was:was-20250706-05
+        image: asia-northeast3-docker.pkg.dev/kdt1-finalproject/yj-repo/yj-was:was-20250710-05
         ports:
         - containerPort: 8080
         env:
@@ -26,16 +26,15 @@ spec:
             secretKeyRef:
               name: db-secret
               key: password
-        - name: JAVA_OPTS
-          value: "-Dspring.config.additional-location=file:/config/application.properties"
-           
+        - name: JAVA_TOOL_OPTIONS
+          value: "-Dspring.config.location=file:/config/application.properties"
 
         volumeMounts:
-        - name: config-volume
-          mountPath: /config/application.properties
-          subPath: application.properties
+        - name: db-config
+          mountPath: /usr/local/tomcat/webapps/ROOT/WEB-INF/classes/spring/data-access.properties
+          subPath: data-access.properties
 
       volumes:
-      - name: config-volume
+      - name: db-config
         configMap:
-          name: was-config
+          name: was-db-config
