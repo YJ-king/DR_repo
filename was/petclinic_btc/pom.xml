@@ -526,7 +526,7 @@
                 <jdbc.driverClassName>com.mysql.cj.jdbc.Driver</jdbc.driverClassName>
                 <jdbc.url>jdbc:mysql://$DB_HOST/petclinic?useUnicode=true</jdbc.url>
                 <jdbc.username>petuser</jdbc.username>
-                <jdbc.password>petpass</jdbc.password>
+                <jdbc.password>petpass1234</jdbc.password>
             </properties>
             <dependencies>
                 <dependency>

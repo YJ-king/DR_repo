@@ -22,3 +22,8 @@ output "eks_node_role_arn" {
   value = module.iam.eks_node_role_arn
 }
 
+output "db_password" {
+  value     = var.db_password
+  sensitive = true
+}
+

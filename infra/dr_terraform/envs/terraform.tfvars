@@ -22,8 +22,8 @@ max_size      = 3
 
 instance_class    = "db.t3.micro"
 allocated_storage = 20
-db_user           = "admin"
-db_password       = "admin1234"
+db_user           = "petuser"
+db_password       = "petpass1234"
 db_name           = "petclinic"
 
 eks_cluster_name = "drb-eks-cluster"
