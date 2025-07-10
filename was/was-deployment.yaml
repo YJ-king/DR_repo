@@ -34,7 +34,7 @@ spec:
               sleep 1
             done
 
-            cat <<EOF > /usr/local/tomcat/webapps/ROOT/WEB-INF/classes/application.properties
+            cat /usr/local/tomcat/webapps/ROOT/WEB-INF/classes/application.properties <<EOF
             spring.datasource.url=jdbc:mysql://${DB_HOST}/${DB_NAME}?autoReconnect=true&failOverReadOnly=false&connectTimeout=2000&socketTimeout=3000&maxReconnects=3
             spring.datasource.username=${DB_USER}
             spring.datasource.password=${DB_PASSWORD}
