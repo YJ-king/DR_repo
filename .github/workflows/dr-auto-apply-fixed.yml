@@ -33,28 +33,6 @@ jobs:
       - name: Terraform Apply
         run: terraform -chdir=infra/dr_terraform/envs apply -auto-approve
 
-      - name: Get RDS endpoint and inject was yaml
-        shell: bash
-        run: |
-          echo "🔧 Running terraform and extracting clean value"
-    
-          TF_RAW=$(terraform -chdir=infra/dr_terraform/envs output -raw rds_endpoint 2>/dev/null || echo "")
-    
-          RDS_ENDPOINT=$(echo "$TF_RAW" | grep -Eo '^[a-z0-9.-]+\.rds\.amazonaws\.com:3306' | head -n 1)
-
-          if [[ -z "$RDS_ENDPOINT" ]]; then
-            echo "❌ Failed to extract RDS endpoint from: [$TF_RAW]"
-            exit 1
-          fi
-
-          echo "📌 Clean RDS: $RDS_ENDPOINT"
-
-          sed -i "s|<RDS_ENDPOINT>|$RDS_ENDPOINT|g" was/was-deployment.yaml
-
-          echo "✅ Injection complete. Verifying:"
-          grep "$RDS_ENDPOINT" was/was-deployment.yaml || echo "⚠️ Not found"
-
-
       - name: Install dependencies (kubectl, awscli, helm)
         run: |
           sudo apt-get update -y
@@ -174,6 +152,25 @@ jobs:
           --docker-email=ci@github.com \
           -n default
 
+      - name: Generate application.properties using RDS Endpoint
+        run: |
+          DB_HOST=$(terraform -chdir=infra/dr_terraform/envs output -raw rds_endpoint | grep -Eo '^[a-z0-9.-]+\.rds\.amazonaws\.com:3306')
+          DB_NAME="petclinic"
+          DB_USER="petuser"
+          DB_PASSWORD=$(kubectl get secret db-secret -o jsonpath="{.data.password}" | base64 -d)
+
+          export DB_HOST DB_NAME DB_USER DB_PASSWORD
+          envsubst < was/application.properties.tpl > was/application.properties
+
+      - name: Create or update ConfigMap for WAS
+        run: |
+          kubectl create configmap was-config \
+          --from-file=application.properties=was/application.properties \
+          -o yaml --dry-run=client | kubectl apply -f -
+
+      - name: Restart WAS Deployment
+        run: |
+          kubectl rollout restart deployment was-deployment
 
       - name: Deploy Web & WAS YAMLs
         run: |

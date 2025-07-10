@@ -20,50 +20,20 @@ spec:
         image: asia-northeast3-docker.pkg.dev/kdt1-finalproject/yj-repo/yj-was:was-20250706-05
         ports:
         - containerPort: 8080
-        command: ["/bin/bash", "-c"]
-        args:
-          - |
-            echo "🌐 DB_HOST=${DB_HOST}"
-
-            rm -rf /usr/local/tomcat/webapps/ROOT
-            rm -f /usr/local/tomcat/webapps/ROOT.war
-
-            for i in {1..30}; do
-              if [ ! -f /usr/local/tomcat/webapps/ROOT.war ] && [ -d /usr/local/tomcat/webapps/ROOT/WEB-INF/classes ]; then
-                echo "✅ ROOT.war 압축 완료"
-                break
-              fi
-              echo "⏳ ROOT.war 압축 대기중... ($i)"
-              sleep 1
-            done
-
-            cat /usr/local/tomcat/webapps/ROOT/WEB-INF/classes/application.properties <<EOF
-            spring.datasource.url=jdbc:mysql://${DB_HOST}/${DB_NAME}?autoReconnect=true&failOverReadOnly=false&connectTimeout=2000&socketTimeout=3000&maxReconnects=3
-            spring.datasource.username=${DB_USER}
-            spring.datasource.password=${DB_PASSWORD}
-            spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
-
-            spring.jpa.hibernate.ddl-auto=update
-            spring.jpa.show-sql=true
-            server.port=8080
-            spring.datasource.hikari.connection-init-sql=SET NAMES utf8mb4
-            spring.datasource.hikari.connection-test-query=SELECT 1
-            EOF
-
-            echo "✅ 설정파일 생성 완료"
-
-            exec /usr/local/tomcat/bin/catalina.sh run
-
         env:
-        - name: DB_HOST
-          value: "<RDS_ENDPOINT>"  # terraform output로 치환될 값
-        - name: DB_NAME
-          value: "petclinic"
-        - name: DB_USER
-          value: "petuser"
+        - name: JAVA_OPTS
+          value: "-Dspring.config.location=/config/application.properties"
         - name: DB_PASSWORD
           valueFrom:
             secretKeyRef:
               name: db-secret
               key: password
+        volumeMounts:
+        - name: config-volume
+          mountPath: /config/application.properties
+          subPath: application.properties
 
+      volumes:
+      - name: config-volume
+        configMap:
+          name: was-config
