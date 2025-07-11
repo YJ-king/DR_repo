@@ -176,9 +176,6 @@ jobs:
           sed -i "s|<DB_HOST>|$RDS_ENDPOINT|g" was/petclinic_btc/src/main/resources/application.properties
           sed -i "s|<DB_HOST>|$RDS_ENDPOINT|g" was/petclinic_btc/pom.xml
 
-      - name: Force delete target/ to ensure clean build
-        run: rm -rf was/petclinic_btc/target
-      
       - name: Maven Build for WAR
         run: |
           cd was/petclinic_btc
