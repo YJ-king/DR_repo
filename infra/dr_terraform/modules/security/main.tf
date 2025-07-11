@@ -48,12 +48,12 @@ resource "aws_security_group" "rds_sg" {
   vpc_id      = var.vpc_id
 
   ingress {
-    description     = "MySQL from EKS Node"
-    from_port       = 3306
-    to_port         = 3306
-    protocol        = "tcp"
-    security_groups = [aws_security_group.eks_node_sg.id]
-  }
+  from_port       = 3306
+  to_port         = 3306
+  protocol        = "tcp"
+  security_groups = [aws_security_group.eks_node_sg.id]
+  description     = "MySQL from EKS"
+}
 
   egress {
     description = "All outbound"
@@ -67,7 +67,6 @@ resource "aws_security_group" "rds_sg" {
     Name = "${var.name_prefix}-rds-sg"
   }
 }
-
 
 # ALB SG
 resource "aws_security_group" "alb_sg" {
