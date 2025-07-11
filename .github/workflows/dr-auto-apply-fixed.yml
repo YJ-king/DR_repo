@@ -186,7 +186,7 @@ jobs:
 
       - name: Debug WAR contents
         run: |
-        unzip -p was/petclinic_btc/target/petclinic.war WEB-INF/classes/application.properties | grep DB_HOST || echo "✅ No DB_HOST found"
+          unzip -p was/petclinic_btc/target/petclinic.war WEB-INF/classes/application.properties | grep DB_HOST || echo "✅ No DB_HOST found"
       - name: Build Docker image for WAS
         run: |
           docker build --no-cache -t asia-northeast3-docker.pkg.dev/kdt1-finalproject/yj-repo/yj-was:was-dr-01 ./was
