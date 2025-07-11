@@ -1,18 +1,3 @@
-data "aws_ami" "eks_default" {
-  owners      = ["602401143452"]
-  most_recent = true
-
-  filter {
-    name   = "name"
-    values = ["amazon-eks-node-1.31-v*"] 
-  }
-
-  filter {
-    name   = "architecture"
-    values = ["x86_64"]
-  }
-}
-
 
 # EKS Cluster 생성
 resource "aws_eks_cluster" "this" {
@@ -45,12 +30,11 @@ resource "aws_eks_node_group" "this" {
     min_size     = var.min_size
   }
 
-  launch_template {
-    id      = aws_launch_template.eks.id
-    version = "$Latest"
+  remote_access {
+    ec2_ssh_key               = var.ec2_key_pair
+    source_security_group_ids = var.eks_sg_ids
   }
-
-  capacity_type  = "ON_DEMAND"
+  capacity_type = "ON_DEMAND"
 
   tags = {
     Name = "${var.name_prefix}-eks-node"
@@ -59,20 +43,3 @@ resource "aws_eks_node_group" "this" {
   depends_on = [aws_eks_cluster.this]
 }
 
-resource "aws_launch_template" "eks" {
-  name_prefix   = "${var.name_prefix}-eks-launch-"
-  image_id      = data.aws_ami.eks_default.id
-  instance_type = var.instance_type
-  key_name      = var.ec2_key_pair
-
-  network_interfaces {
-    security_groups = var.eks_sg_ids
-  }
-
-  tag_specifications {
-    resource_type = "instance"
-    tags = {
-      Name = "${var.name_prefix}-eks-node"
-    }
-  }
-}
