@@ -29,7 +29,7 @@ resource "aws_eks_node_group" "this" {
     max_size     = var.max_size
     min_size     = var.min_size
   }
-
+  ami_type = "AL2023_x86_64_STANDARD"
   remote_access {
     ec2_ssh_key               = var.ec2_key_pair
     source_security_group_ids = var.eks_sg_ids
