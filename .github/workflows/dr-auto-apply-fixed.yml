@@ -158,20 +158,23 @@ jobs:
           --docker-email=ci@github.com \
           -n default
 
-      - name: Generate application.properties for Petclinic WAR
+      - name: Get RDS endpoint and inject into properties/pom.xml
+        shell: bash
         run: |
-          DB_HOST=$(terraform -chdir=infra/dr_terraform/envs output -raw rds_endpoint | grep -Eo '^[a-z0-9.-]+\.rds\.amazonaws\.com:3306')
-          DB_NAME="petclinic"
-          DB_USER="petuser"
-          DB_PASSWORD=$(terraform -chdir=infra/dr_terraform/envs output -raw db_password)
+          echo "🔧 Extracting clean RDS endpoint from terraform output"
+    
+          TF_RAW=$(terraform -chdir=infra/dr_terraform/envs output -raw rds_endpoint 2>/dev/null || echo "")
+    
+          RDS_ENDPOINT=$(echo "$TF_RAW" | grep -Eo '^[a-z0-9.-]+\.rds\.amazonaws\.com:3306' | head -n 1)
 
-          kubectl delete secret db-secret --ignore-not-found
+          if [[ -z "$RDS_ENDPOINT" ]]; then
+            echo "❌ Failed to extract RDS endpoint from: [$TF_RAW]"
+            exit 1
+          fi
 
-          kubectl create secret generic db-secret \
-          --from-literal=host="$DB_HOST" \
-          --from-literal=name="$DB_NAME" \
-          --from-literal=user="$DB_USER" \
-          --from-literal=password="$DB_PASSWORD"
+          sed -i "s|<DB_HOST>|$RDS_ENDPOINT|g" was/petclinic_btc/src/main/resources/application.properties
+
+          sed -i "s|<DB_HOST>|$RDS_ENDPOINT|g" was/petclinic_btc/pom.xml
 
       - name: Maven Build for WAR
         run: |
