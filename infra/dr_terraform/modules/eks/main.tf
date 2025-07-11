@@ -23,7 +23,7 @@ resource "aws_eks_cluster" "this" {
     subnet_ids              = var.private_subnet_ids
     endpoint_private_access = false
     endpoint_public_access  = true
-    security_group_ids      = [var.eks_sg_id]
+    security_group_ids      = var.eks_sg_ids
   }
 
   kubernetes_network_config {
@@ -66,7 +66,7 @@ resource "aws_launch_template" "eks" {
   key_name      = var.ec2_key_pair
 
   network_interfaces {
-    security_groups = [var.eks_sg_id]
+    security_groups = var.eks_sg_ids
   }
 
   tag_specifications {
