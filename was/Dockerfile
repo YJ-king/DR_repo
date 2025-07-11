@@ -6,5 +6,5 @@ RUN apt update && \
 
 RUN rm -rf /usr/local/tomcat/webapps/*
 
-COPY ./was/petclinic_btc/target/petclinic.war /usr/local/tomcat/webapps/ROOT.war
+COPY ./petclinic_btc/target/petclinic.war /usr/local/tomcat/webapps/ROOT.war
 
