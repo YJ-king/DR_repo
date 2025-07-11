@@ -186,11 +186,11 @@ jobs:
           unzip -p was/petclinic_btc/target/petclinic.war WEB-INF/classes/application.properties | grep DB_HOST || echo "✅ No DB_HOST found"
       - name: Build Docker image for WAS
         run: |
-          docker build --no-cache -t asia-northeast3-docker.pkg.dev/kdt1-finalproject/yj-repo/yj-was:was-dr-01 ./was
+          docker build --no-cache -t asia-northeast3-docker.pkg.dev/kdt1-finalproject/yj-repo/yj-was:was-dr-02 ./was
 
       - name: Push Docker image to Artifact Registry
         run: |
-          docker push asia-northeast3-docker.pkg.dev/kdt1-finalproject/yj-repo/yj-was:was-dr-01
+          docker push asia-northeast3-docker.pkg.dev/kdt1-finalproject/yj-repo/yj-was:was-dr-02
 
       - name: Deploy Web & WAS YAMLs
         run: |
