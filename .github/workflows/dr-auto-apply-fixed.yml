@@ -172,8 +172,8 @@ jobs:
             exit 1
           fi
 
+          sed -i "s|<DB_HOST>|$RDS_ENDPOINT|g" was/petclinic_btc/src/main/resources/spring/data-access.properties
           sed -i "s|<DB_HOST>|$RDS_ENDPOINT|g" was/petclinic_btc/src/main/resources/application.properties
-
           sed -i "s|<DB_HOST>|$RDS_ENDPOINT|g" was/petclinic_btc/pom.xml
 
       - name: Maven Build for WAR
