@@ -176,14 +176,20 @@ jobs:
           sed -i "s|<DB_HOST>|$RDS_ENDPOINT|g" was/petclinic_btc/src/main/resources/application.properties
           sed -i "s|<DB_HOST>|$RDS_ENDPOINT|g" was/petclinic_btc/pom.xml
 
+      - name: Force delete target/ to ensure clean build
+        run: rm -rf was/petclinic_btc/target
+      
       - name: Maven Build for WAR
         run: |
           cd was/petclinic_btc
           ./mvnw clean package -DskipTests -PMySQL
 
+      - name: Debug WAR contents
+        run: |
+        unzip -p was/petclinic_btc/target/petclinic.war WEB-INF/classes/application.properties | grep DB_HOST || echo "✅ No DB_HOST found"
       - name: Build Docker image for WAS
         run: |
-          docker build -t asia-northeast3-docker.pkg.dev/kdt1-finalproject/yj-repo/yj-was:was-dr-01 ./was
+          docker build --no-cache -t asia-northeast3-docker.pkg.dev/kdt1-finalproject/yj-repo/yj-was:was-dr-01 ./was
 
       - name: Push Docker image to Artifact Registry
         run: |
