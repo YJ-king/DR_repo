@@ -38,7 +38,6 @@ module "eks" {
   min_size           = var.min_size
   max_size           = var.max_size
   instance_type      = var.instance_type
-  ami_id             = var.ami_id
   depends_on         = [module.iam, module.security, module.network]
 }
 

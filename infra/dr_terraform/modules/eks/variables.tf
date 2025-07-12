@@ -42,6 +42,3 @@ variable "node_role_arn" {
   type = string
 }
 
-variable "ami_id" {
-  type = string
-}

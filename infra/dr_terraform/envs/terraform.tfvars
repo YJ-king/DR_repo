@@ -28,4 +28,3 @@ db_name           = "petclinic"
 
 eks_cluster_name = "drb-eks-cluster"
 thumbprint       = "1bbb4ba787ef7707f4ecbc612587ec28805cffc4"
-ami_id           = "ami-0fe8bec493a81c7da"
