@@ -36,7 +36,7 @@ resource "aws_eks_node_group" "this" {
   capacity_type = "ON_DEMAND"
 
   remote_access {
-  ec2_ssh_key = "dummy-key"  
+  ec2_ssh_key = "dr-key"  
   source_security_group_ids = var.eks_sg_ids
   }
 
