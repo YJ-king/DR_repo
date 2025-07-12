@@ -47,13 +47,6 @@ resource "aws_security_group" "rds_sg" {
   description = "Allow MySQL from EKS"
   vpc_id      = var.vpc_id
 
-  ingress {
-  from_port       = 3306
-  to_port         = 3306
-  protocol        = "tcp"
-  security_groups = [aws_security_group.eks_node_sg.id]
-  description     = "MySQL from EKS"
-}
 
   egress {
     description = "All outbound"
@@ -103,3 +96,11 @@ resource "aws_security_group" "alb_sg" {
   }
 }
 
+resource "aws_security_group_rule" "rds_ingress_from_eks" {
+  type                     = "ingress"
+  from_port                = 3306
+  to_port                  = 3306
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.rds_sg.id
+  source_security_group_id = aws_security_group.eks_node_sg.id
+}

@@ -30,7 +30,7 @@ module "eks" {
   source             = "../modules/eks"
   name_prefix        = var.name_prefix
   private_subnet_ids = module.network.private_subnet_ids
-  eks_sg_ids         = [ module.security.eks_node_sg_id, module.security.rds_sg_id ]
+  eks_sg_ids         = [module.security.eks_node_sg_id, module.security.rds_sg_id]
   ec2_key_pair       = var.ec2_key_pair
   eks_role_arn       = module.iam.eks_cluster_role_arn
   node_role_arn      = module.iam.eks_node_role_arn
@@ -38,6 +38,8 @@ module "eks" {
   min_size           = var.min_size
   max_size           = var.max_size
   instance_type      = var.instance_type
+  ami_id             = var.ami_id
+  depends_on         = [module.iam, module.security, module.network]
 }
 
 module "rds" {
@@ -52,6 +54,7 @@ module "rds" {
   db_password        = var.db_password
   db_name            = var.db_name
   availability_zone  = var.private_subnet_az_a
+  depends_on         = [module.network, module.security]
 }
 
 module "irsa_alb" {
@@ -59,6 +62,7 @@ module "irsa_alb" {
   name_prefix      = var.name_prefix
   cluster_oidc_url = module.eks.oidc_issuer_url
   thumbprint       = var.thumbprint
+  depends_on       = [module.eks]
 }
 
 
