@@ -7,3 +7,4 @@ variable "name_prefix" {
   description = "Prefix for naming resources (e.g. dr)"
 }
 
+

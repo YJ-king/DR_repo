@@ -1,3 +1,11 @@
+resource "aws_security_group_rule" "rds_ingress_from_eks" {
+  type                     = "ingress"
+  from_port                = 3306
+  to_port                  = 3306
+  protocol                 = "tcp"
+  security_group_id        = module.security.rds_sg_id
+  source_security_group_id = module.security.eks_node_sg_id
+}
 
 module "network" {
   source = "../modules/network"
@@ -16,9 +24,9 @@ module "network" {
 }
 
 module "security" {
-  source      = "../modules/security"
-  vpc_id      = module.network.vpc_id
-  name_prefix = var.name_prefix
+  source          = "../modules/security"
+  vpc_id          = module.network.vpc_id
+  name_prefix     = var.name_prefix
 }
 
 module "iam" {
@@ -30,7 +38,7 @@ module "eks" {
   source             = "../modules/eks"
   name_prefix        = var.name_prefix
   private_subnet_ids = module.network.private_subnet_ids
-  eks_sg_ids         = [module.security.eks_node_sg_id, module.security.rds_sg_id]
+  eks_sg_ids         = [module.security.eks_node_sg_id]
   ec2_key_pair       = var.ec2_key_pair
   eks_role_arn       = module.iam.eks_cluster_role_arn
   node_role_arn      = module.iam.eks_node_role_arn

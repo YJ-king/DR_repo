@@ -1,3 +1,4 @@
+
 # EKS Node Group SG (Web/WAS Pod용, Ingress ALB 허용 등)
 resource "aws_security_group" "eks_node_sg" {
   name        = "${var.name_prefix}-eks-node-sg"
@@ -98,9 +99,10 @@ resource "aws_security_group" "alb_sg" {
 
 resource "aws_security_group_rule" "rds_ingress_from_eks" {
   type                     = "ingress"
-  from_port                = 3306
-  to_port                  = 3306
-  protocol                 = "tcp"
-  security_group_id        = aws_security_group.rds_sg.id
+  from_port               = 3306
+  to_port                 = 3306
+  protocol                = "tcp"
+  security_group_id       = aws_security_group.rds_sg.id
   source_security_group_id = aws_security_group.eks_node_sg.id
 }
+
