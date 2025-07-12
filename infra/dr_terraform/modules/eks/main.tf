@@ -1,7 +1,3 @@
-data "aws_ssm_parameter" "eks_ami" {
-  name = "/aws/service/eks/optimized-ami/1.33/amazon-linux-2023/x86_64/standard/recommended/image_id"
-}
-
 
 # EKS Cluster 생성
 resource "aws_eks_cluster" "this" {
@@ -21,27 +17,6 @@ resource "aws_eks_cluster" "this" {
 
 }
 
-resource "aws_launch_template" "eks" {
-  name_prefix   = "${var.name_prefix}-eks-lt-"
-  image_id      = data.aws_ssm_parameter.eks_ami.value
-  instance_type = var.instance_type
-  key_name      = var.ec2_key_pair
-
-  vpc_security_group_ids = var.eks_sg_ids
-
-  tag_specifications {
-    resource_type = "instance"
-    tags = {
-      Name = "${var.name_prefix}-eks-node"
-    }
-  }
-
-  lifecycle {
-    create_before_destroy = true
-  }
-  depends_on = [aws_eks_cluster.this]
-}
-
 
 # EKS Node Group
 resource "aws_eks_node_group" "this" {
@@ -56,16 +31,17 @@ resource "aws_eks_node_group" "this" {
     min_size     = var.min_size
   }
 
-  launch_template {
-    id      = aws_launch_template.eks.id
-    version = "$Latest"
-  }
-
+  ami_type       = "AL2023_x86_64_STANDARD"
+  instance_types = ["t3.medium"]
   capacity_type = "ON_DEMAND"
+
+  remote_access {
+    source_security_group_ids = var.eks_sg_ids
+  }
 
   tags = {
     Name = "${var.name_prefix}-eks-node"
   }
 
-  depends_on = [aws_eks_cluster.this, aws_launch_template.eks]
+  depends_on = [aws_eks_cluster.this]
 }
