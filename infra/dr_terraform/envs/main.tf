@@ -7,6 +7,21 @@ resource "aws_security_group_rule" "rds_ingress_from_eks" {
   source_security_group_id = module.security.eks_node_sg_id
 }
 
+resource "aws_security_group_rule" "allow_cluster_to_node_443" {
+  type                     = "ingress"
+  from_port                = 443
+  to_port                  = 443
+  protocol                 = "tcp"
+  security_group_id        = module.security.eks_node_sg_id
+  source_security_group_id = module.eks.cluster_security_group_id  # 클러스터 SG
+  description              = "Allow EKS Control Plane to access node on port 443"
+}
+
+resource "aws_iam_role_policy_attachment" "eks_node_SSM" {
+  role       = module.iam.eks_node_role_name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+}
+
 module "network" {
   source = "../modules/network"
 
