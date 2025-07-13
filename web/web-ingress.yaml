@@ -10,7 +10,7 @@ metadata:
 spec:
   ingressClassName: alb  # ✅ ALB IngressClass 명시
   rules:
-  - host: yjking.shop
+  - host: sub.yjking.shop
     http:
       paths:
       - path: /
