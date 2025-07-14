@@ -208,12 +208,12 @@ jobs:
           POD_NAME=$(kubectl get pod -l app=was -o jsonpath='{.items[0].metadata.name}')
           echo "📦 Running DB restore in pod: $POD_NAME"
 
-          kubectl exec $POD_NAME -- sh -c "aws s3 cp s3://$S3_BUCKET/$S3_OBJECT /tmp/db_backup.sql.gz"
-          kubectl exec $POD_NAME -- sh -c "gunzip -f /tmp/db_backup.sql.gz"
+          kubectl exec $POD_NAME -c was -- sh -c "aws s3 cp s3://$S3_BUCKET/$S3_OBJECT /tmp/db_backup.sql.gz"
+          kubectl exec $POD_NAME -c was -- sh -c "gunzip -f /tmp/db_backup.sql.gz"
 
           RDS_HOST=$(terraform -chdir=infra/dr_terraform/envs output -raw rds_endpoint | grep -Eo '^[a-z0-9.-]+\.rds\.amazonaws\.com')
 
-          kubectl exec $POD_NAME -- sh -c "mysql -h $RDS_HOST -u $DB_USER -p$DB_PASSWORD $DB_NAME < /tmp/db_backup.sql"
+          kubectl exec $POD_NAME -c was -- sh -c "mysql -h $RDS_HOST -u $DB_USER -p$DB_PASSWORD $DB_NAME < /tmp/db_backup.sql"
 
       - name: Slack Notification (Success)
         if: success()
