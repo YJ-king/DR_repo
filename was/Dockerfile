@@ -1,7 +1,7 @@
 FROM tomcat:9.0.105-jdk11
 
 RUN apt update && \
-    apt install -y bash mysql-client curl gzip && \
+    apt install -y bash mysql-client curl gzip unzip && \
     curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && \
     unzip awscliv2.zip && \
     ./aws/install && \
