@@ -186,16 +186,34 @@ jobs:
           unzip -p was/petclinic_btc/target/petclinic.war WEB-INF/classes/application.properties | grep DB_HOST || echo "✅ No DB_HOST found"
       - name: Build Docker image for WAS
         run: |
-          docker build --no-cache -t asia-northeast3-docker.pkg.dev/kdt1-finalproject/yj-repo/yj-was:was-dr-02 ./was
+          docker build --no-cache -t asia-northeast3-docker.pkg.dev/kdt1-finalproject/yj-repo/yj-was:was-dr-03 ./was
 
       - name: Push Docker image to Artifact Registry
         run: |
-          docker push asia-northeast3-docker.pkg.dev/kdt1-finalproject/yj-repo/yj-was:was-dr-02
+          docker push asia-northeast3-docker.pkg.dev/kdt1-finalproject/yj-repo/yj-was:was-dr-03
 
       - name: Deploy Web & WAS YAMLs
         run: |
           kubectl apply -f web/
           kubectl apply -f was/
+
+      - name: Restore MySQL DB from S3 to RDS inside WAS Pod
+        env:
+          DB_NAME: petclinic
+          DB_USER: petuser
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          S3_BUCKET: yj-dr-bucket
+          S3_OBJECT: db_backup.sql.gz
+        run: |
+          POD_NAME=$(kubectl get pod -l app=was -o jsonpath='{.items[0].metadata.name}')
+          echo "📦 Running DB restore in pod: $POD_NAME"
+
+          kubectl exec $POD_NAME -- sh -c "aws s3 cp s3://$S3_BUCKET/$S3_OBJECT /tmp/db_backup.sql.gz"
+          kubectl exec $POD_NAME -- sh -c "gunzip -f /tmp/db_backup.sql.gz"
+
+          RDS_HOST=$(terraform -chdir=infra/dr_terraform/envs output -raw rds_endpoint | grep -Eo '^[a-z0-9.-]+\.rds\.amazonaws\.com')
+
+          kubectl exec $POD_NAME -- sh -c "mysql -h $RDS_HOST -u $DB_USER -p$DB_PASSWORD $DB_NAME < /tmp/db_backup.sql"
 
       - name: Slack Notification (Success)
         if: success()
