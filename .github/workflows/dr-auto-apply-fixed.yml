@@ -197,3 +197,17 @@ jobs:
           kubectl apply -f web/
           kubectl apply -f was/
 
+      - name: Slack Notification (Success)
+        if: success()
+        run: |
+          curl -X POST -H 'Content-type: application/json' \
+            --data '{"text":"✅ DR 인프라 복구가 성공적으로 완료되었습니다."}' \
+            "${{ secrets.SLACK_WEBHOOK_URL }}"
+
+      - name: Slack Notification (Failure)
+        if: failure()
+        run: |
+          curl -X POST -H 'Content-type: application/json' \
+            --data '{"text":"❌ DR 복구 중 오류가 발생했습니다."}' \
+            "${{ secrets.SLACK_WEBHOOK_URL }}"
+
