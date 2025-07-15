@@ -27,6 +27,9 @@ jobs:
         with:
           terraform_version: 1.7.5
 
+      - name: Set start time
+        run: echo "START_TIME=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> $GITHUB_ENV
+
       - name: Terraform Init
         run: terraform -chdir=infra/dr_terraform/envs init
 
@@ -266,6 +269,19 @@ jobs:
         run: |
           kubectl apply -f web/
           kubectl apply -f was/
+
+      - name: Set end time
+        run: echo "END_TIME=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> $GITHUB_ENV
+
+      - name: Install Google BigQuery SDK
+        run: pip install --upgrade google-cloud-bigquery
+
+      - name: Export to BigQuery
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.BQ_KEY }}
+          TRIGGER_ID: dr-${{ github.run_number }}
+          SLACK_APPROVE_TIME: ${{ github.event.inputs.approve_time }}  # Cloud Run에서 전달
+        run: python ../../export_to_bigquery.py
 
       - name: Slack Notification (Success)
         if: success()
