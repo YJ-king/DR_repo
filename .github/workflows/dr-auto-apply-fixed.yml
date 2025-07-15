@@ -195,7 +195,7 @@ jobs:
       - name: Get RDS Endpoint from Terraform Output
         id: rds
         run: |
-          RDS_ENDPOINT=$(terraform -chdir=infra/dr_terraform/envs output -raw rds_endpoint)
+          RDS_ENDPOINT=$(terraform -chdir=infra/dr_terraform/envs output -raw rds_endpoint | tr -d '\n')
           RDS_HOST=${RDS_ENDPOINT%%:*}
           echo "rds_host=$RDS_HOST" >> $GITHUB_OUTPUT
 
