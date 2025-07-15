@@ -278,9 +278,12 @@ jobs:
 
       - name: Export to BigQuery
         env:
-          GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.BQ_KEY }}
+          BQ_KEY: ${{ secrets.BQ_KEY }}
           TRIGGER_ID: dr-${{ github.run_number }}
           SLACK_APPROVE_TIME: ${{ github.event.inputs.approve_time }}  # Cloud Run에서 전달
+          START_TIME: ${{ env.START_TIME }}
+          END_TIME: ${{ env.END_TIME }}
+
         run: python export_to_bigquery.py
 
       - name: Slack Notification (Success)
