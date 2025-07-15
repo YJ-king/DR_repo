@@ -44,3 +44,10 @@ resource "aws_iam_role_policy_attachment" "alb_policy_attach" {
   role       = aws_iam_role.alb_controller_irsa.name
 }
 
+terraform {
+  required_providers {
+    kubernetes = {
+      source = "hashicorp/kubernetes"
+    }
+  }
+}

@@ -13,7 +13,7 @@ resource "aws_security_group_rule" "allow_cluster_to_node_443" {
   to_port                  = 443
   protocol                 = "tcp"
   security_group_id        = module.security.eks_node_sg_id
-  source_security_group_id = module.eks.cluster_security_group_id  # 클러스터 SG
+  source_security_group_id = module.eks.cluster_security_group_id # 클러스터 SG
   description              = "Allow EKS Control Plane to access node on port 443"
 }
 
@@ -39,9 +39,9 @@ module "network" {
 }
 
 module "security" {
-  source          = "../modules/security"
-  vpc_id          = module.network.vpc_id
-  name_prefix     = var.name_prefix
+  source      = "../modules/security"
+  vpc_id      = module.network.vpc_id
+  name_prefix = var.name_prefix
 }
 
 module "iam" {
@@ -84,7 +84,16 @@ module "irsa_alb" {
   name_prefix      = var.name_prefix
   cluster_oidc_url = module.eks.oidc_issuer_url
   thumbprint       = var.thumbprint
-  depends_on       = [module.eks]
+  # dummy comment added
+  depends_on = [module.eks]
 }
 
+module "irsa_s3" {
+  source      = "../modules/irsa_s3"
+  name_prefix = var.name_prefix
+  oidc_url    = module.eks.oidc_issuer_url
+  oidc_arn    = module.irsa_alb.alb_oidc_arn
+
+  depends_on = [module.irsa_alb]
+}
 

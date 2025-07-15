@@ -27,3 +27,10 @@ output "db_password" {
   sensitive = true
 }
 
+output "alb_oidc_arn" {
+  value = module.irsa_alb.alb_oidc_arn
+}
+
+output "role_arn" {
+  value = module.irsa_s3.role_arn
+}

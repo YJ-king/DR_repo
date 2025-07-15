@@ -192,28 +192,65 @@ jobs:
         run: |
           docker push asia-northeast3-docker.pkg.dev/kdt1-finalproject/yj-repo/yj-was:was-dr-03
 
+      - name: Get RDS Endpoint from Terraform Output
+        id: rds
+        run: |
+          RDS_ENDPOINT=$(terraform -chdir=infra/dr_terraform/envs output -raw rds_endpoint)
+          RDS_HOST=${RDS_ENDPOINT%%:*}
+          echo "rds_host=$RDS_HOST" >> $GITHUB_OUTPUT
+
+      - name: Create db-secret from GitHub Secrets
+        run: |
+          echo "🔐 Creating db-secret..."
+          cat <<EOF | kubectl apply -f -
+          apiVersion: v1
+          kind: Secret
+          metadata:
+            name: yj-db-secret
+            namespace: default
+          type: Opaque
+          stringData:
+            host: "${{ steps.rds.outputs.rds_host }}"
+            username: "${{ env.DB_USER }}"
+            password: "${{ secrets.DB_PASSWORD }}"
+            dbname: "${{ env.DB_NAME }}"
+          EOF
+
+      - name: Get IRSA Role ARN from Terraform Output
+        id: irsa
+        run: |
+          S3_ROLE_ARN=$(terraform -chdir=infra/dr_terraform/envs output -raw role_arn)
+          echo "irsa_role_arn=$S3_ROLE_ARN" >> $GITHUB_OUTPUT
+
+      - name: Apply IRSA ServiceAccount
+        run: |
+          echo "🔧 Applying IRSA SA"
+          envsubst < data/irsa-sa.yaml.tpl > data/irsa-sa.yaml
+          kubectl apply -f data/irsa-sa.yaml 
+
+      - name: Generate restore-job.yaml
+        run: |
+          echo "🛠️ Generating restore-job.yaml"
+          export DB_NAME=${{ env.DB_NAME }}
+          export DB_USER=${{ env.DB_USER }}
+          export DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+          export RDS_HOST=${{ steps.rds.outputs.rds_host }}
+          envsubst < data/restore-job.yaml.tpl > data/restore-job.yaml
+
+      - name: Run Restore Job
+        run: |
+          echo "📦 Applying restore job"
+          kubectl apply -f data/restore-job.yaml
+
+      - name: Wait for Restore Job Completion
+        run: |
+          echo "⏳ Waiting for db-restore-job to complete..."
+          kubectl wait --for=condition=complete --timeout=120s job/db-restore-job
+
       - name: Deploy Web & WAS YAMLs
         run: |
           kubectl apply -f web/
           kubectl apply -f was/
-
-      - name: Restore MySQL DB from S3 to RDS inside WAS Pod
-        env:
-          DB_NAME: petclinic
-          DB_USER: petuser
-          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-          S3_BUCKET: yj-dr-bucket
-          S3_OBJECT: db_backup.sql.gz
-        run: |
-          POD_NAME=$(kubectl get pod -l app=was -o jsonpath='{.items[0].metadata.name}')
-          echo "📦 Running DB restore in pod: $POD_NAME"
-
-          kubectl exec $POD_NAME -c was -- sh -c "aws s3 cp s3://$S3_BUCKET/$S3_OBJECT /tmp/db_backup.sql.gz"
-          kubectl exec $POD_NAME -c was -- sh -c "gunzip -f /tmp/db_backup.sql.gz"
-
-          RDS_HOST=$(terraform -chdir=infra/dr_terraform/envs output -raw rds_endpoint | grep -Eo '^[a-z0-9.-]+\.rds\.amazonaws\.com')
-
-          kubectl exec $POD_NAME -c was -- sh -c "mysql -h $RDS_HOST -u $DB_USER -p$DB_PASSWORD $DB_NAME < /tmp/db_backup.sql"
 
       - name: Slack Notification (Success)
         if: success()
