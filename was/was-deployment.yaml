@@ -12,7 +12,7 @@ spec:
       labels:
         app: was
     spec:
-      serviceAccountName: was-irsa
+      serviceAccountName: irsa-s3-access
       imagePullSecrets:
       - name: regcred
 
