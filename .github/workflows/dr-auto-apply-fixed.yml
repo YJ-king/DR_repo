@@ -194,10 +194,14 @@ jobs:
 
       - name: Get RDS Endpoint from Terraform Output
         id: rds
+        shell: bash
         run: |
+          set -euo pipefail
           RDS_ENDPOINT=$(terraform -chdir=infra/dr_terraform/envs output -raw rds_endpoint | tr -d '\n')
-          RDS_HOST=${RDS_ENDPOINT%%:*}
-          echo "rds_host=$RDS_HOST" >> $GITHUB_OUTPUT
+          RDS_HOST="${RDS_ENDPOINT%%:*}"
+          echo "✅ RDS_ENDPOINT: $RDS_ENDPOINT"
+          echo "✅ RDS_HOST: $RDS_HOST"
+          echo "rds_host=$RDS_HOST" | tee -a "$GITHUB_OUTPUT"
 
       - name: Create db-secret from GitHub Secrets
         env:
