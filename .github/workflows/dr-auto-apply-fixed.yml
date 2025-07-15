@@ -219,7 +219,7 @@ jobs:
       - name: Get IRSA Role ARN from Terraform Output
         id: irsa
         run: |
-          S3_ROLE_ARN=$(terraform -chdir=infra/dr_terraform/envs output -raw role_arn)
+          S3_ROLE_ARN=$(terraform -chdir=infra/dr_terraform/envs output -raw role_arn | tr -d '\n')
           echo "irsa_role_arn=$S3_ROLE_ARN" >> $GITHUB_OUTPUT
 
       - name: Apply IRSA ServiceAccount
