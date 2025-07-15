@@ -200,6 +200,11 @@ jobs:
           echo "rds_host=$RDS_HOST" >> $GITHUB_OUTPUT
 
       - name: Create db-secret from GitHub Secrets
+        env:
+          DB_USER: petuser
+          DB_NAME: petclinic
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          RDS_HOST: ${{ steps.rds.outputs.rds_host }}
         run: |
           echo "🔐 Creating db-secret..."
           cat <<EOF | kubectl apply -f -
@@ -210,10 +215,10 @@ jobs:
             namespace: default
           type: Opaque
           stringData:
-            host: "${{ steps.rds.outputs.rds_host }}"
-            username: "${{ env.DB_USER }}"
-            password: "${{ secrets.DB_PASSWORD }}"
-            dbname: "${{ env.DB_NAME }}"
+            host: $RDS_HOST
+            username: $DB_USER
+            password: $DB_PASSWORD
+            dbname: $DB_NAME
           EOF
 
       - name: Get IRSA Role ARN from Terraform Output
@@ -229,12 +234,13 @@ jobs:
           kubectl apply -f data/irsa-sa.yaml 
 
       - name: Generate restore-job.yaml
+        env:
+          DB_NAME: petclinic
+          DB_USER: petuser
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          RDS_HOST: ${{ steps.rds.outputs.rds_host }}
         run: |
           echo "🛠️ Generating restore-job.yaml"
-          export DB_NAME=${{ env.DB_NAME }}
-          export DB_USER=${{ env.DB_USER }}
-          export DB_PASSWORD=${{ secrets.DB_PASSWORD }}
-          export RDS_HOST=${{ steps.rds.outputs.rds_host }}
           envsubst < data/restore-job.yaml.tpl > data/restore-job.yaml
 
       - name: Run Restore Job
