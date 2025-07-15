@@ -26,21 +26,21 @@ spec:
         - name: RDS_HOST
           valueFrom:
             secretKeyRef:
-              name: db-secret
+              name: yj-db-secret
               key: host
         - name: DB_USER
           valueFrom:
             secretKeyRef:
-              name: db-secret
+              name: yj-db-secret
               key: username
         - name: DB_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: db-secret
+              name: yj-db-secret
               key: password
         - name: DB_NAME
           valueFrom:
             secretKeyRef:
-              name: db-secret
+              name: yj-db-secret
               key: dbname
 
