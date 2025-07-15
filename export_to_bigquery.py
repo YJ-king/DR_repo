@@ -30,7 +30,7 @@ client = bigquery.Client(credentials=credentials, project="kdt1-finalproject")
 # [3] 행 만들기
 row = [{
     "trigger_id": trigger_id,
-    "slack_approve_time": approve_time,
+    "slack_approve_time": approve_time or None,
     "action_start_time": start_time,
     "action_end_time": end_time,
     "status": status
