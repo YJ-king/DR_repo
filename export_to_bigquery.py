@@ -1,7 +1,15 @@
 import os
+import json
+import tempfile
 from google.cloud import bigquery
 from google.oauth2 import service_account
 from datetime import datetime
+
+bq_key_str = os.environ.get("BQ_KEY")
+
+with tempfile.NamedTemporaryFile(mode='w', delete=False) as temp_file:
+    temp_file.write(bq_key_str)
+    temp_file_path = temp_file.name
 
 # [1] 환경변수에서 값 받아오기
 trigger_id = os.environ.get("TRIGGER_ID")
@@ -16,10 +24,8 @@ dataset_id = "DR_analysis"
 table_id = "dr_recovery_logs"
 table_ref = f"{project_id}.{dataset_id}.{table_id}"
 
-credentials = service_account.Credentials.from_service_account_file(
-    os.environ["GOOGLE_APPLICATION_CREDENTIALS"]
-)
-client = bigquery.Client(credentials=credentials, project=project_id)
+credentials = service_account.Credentials.from_service_account_file(temp_file_path)
+client = bigquery.Client(credentials=credentials, project="kdt1-finalproject")
 
 # [3] 행 만들기
 row = [{
