@@ -17,10 +17,8 @@ spec:
         command: ["/bin/bash", "-c"]
         args:
           - |
-            echo "📦 백업 다운로드 중..."
             aws s3 cp s3://yj-dr-bucket/db_backup.sql.gz /tmp/db.sql.gz
             gunzip /tmp/db.sql.gz
-            echo "🔁 RDS에 복원 중..."
             mysql -h drb-mysql.c6vkzvcvqawh.ap-northeast-2.rds.amazonaws.com -u petuser -ppetpass1234 petclinic < /tmp/db.sql
         env:
         - name: RDS_HOST
