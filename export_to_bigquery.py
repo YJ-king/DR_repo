@@ -33,10 +33,10 @@ client = bigquery.Client(credentials=credentials, project="kdt1-finalproject")
 row = [{
     "trigger_id": trigger_id,
     "slack_approve_time": approve_time or None,
-    "action_start_time": start_time,
+    "action_start_time": start_time or None,
     "rds_restore_complete_time": rds_restore_complete_time or None,
     "was_ready_time": was_ready_time or None,
-    "action_end_time": end_time,
+    "action_end_time": end_time or None,
     "status": status
 }]
 
