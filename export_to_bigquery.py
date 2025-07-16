@@ -18,6 +18,7 @@ start_time = os.environ.get("START_TIME")
 terraform_end_time = os.environ.get("TERRAFORM_END_TIME")
 rds_restore_complete_time = os.environ.get("RDS_RESTORE_COMPLETE_TIME")
 was_ready_time = os.environ.get("WAS_READY_TIME")
+action_end_time = os.environ.get("ACTION_END_TIME")
 status = os.environ.get("STATUS", "success")
 
 # [2] BigQuery 연결 설정
@@ -37,6 +38,7 @@ row = [{
     "terraform_end_time": terraform_end_time or None,
     "rds_restore_complete_time": rds_restore_complete_time or None,
     "was_ready_time": was_ready_time or None,
+    "action_end_time": action_end_time or None,
     "status": status
 }]
 

@@ -285,6 +285,9 @@ jobs:
           kubectl wait --for=condition=Ready pod -l app=was --timeout=300s
           echo "WAS_READY_TIME=$(date -u +"%Y-%m-%dT%H:%M:%SZ")" >> $GITHUB_ENV
 
+      - name: Save Actions end time
+        run: echo "ACTION_END_TIME=$(date -u +"%Y-%m-%dT%H:%M:%SZ")" >> $GITHUB_ENV
+
       - name: Install Google BigQuery SDK
         run: pip install --upgrade google-cloud-bigquery
 
