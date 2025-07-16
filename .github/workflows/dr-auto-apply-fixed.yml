@@ -2,7 +2,11 @@ name: DR Terraform Apply
 
 on:
   workflow_dispatch:  # ✅ 수동 실행용 (나중에 Cloud Run에서 API로 호출 가능)
-
+    inputs:
+      approve_time:
+        description: "Slack 승인 시각 (ISO8601)"
+        required: false
+        default: ""
 jobs:
   terraform-apply:
     name: Terraform Apply on AWS
