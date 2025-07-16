@@ -265,13 +265,22 @@ jobs:
           echo "⏳ Waiting for db-restore-job to complete..."
           kubectl wait --for=condition=complete --timeout=120s job/db-restore-job
 
+      - name: Wait for RDS restore job to complete
+        run: |
+        kubectl wait --for=condition=complete job/restore-job --timeout=300s
+
+      - name: Save RDS restore complete time
+        run: echo "RDS_RESTORE_COMPLETE_TIME=$(date -u +"%Y-%m-%dT%H:%M:%SZ")" >> $GITHUB_ENV
+
       - name: Deploy Web & WAS YAMLs
         run: |
           kubectl apply -f web/
           kubectl apply -f was/
 
-      - name: Set end time
-        run: echo "END_TIME=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> $GITHUB_ENV
+      - name: Wait for WAS pod to be ready
+        run: |
+        kubectl wait --for=condition=Ready pod -l app=was --timeout=300s
+        echo "WAS_READY_TIME=$(date -u +"%Y-%m-%dT%H:%M:%SZ")" >> $GITHUB_ENV
 
       - name: Install Google BigQuery SDK
         run: pip install --upgrade google-cloud-bigquery
@@ -300,3 +309,5 @@ jobs:
             --data '{"text":"❌ DR 복구 중 오류가 발생했습니다."}' \
             "${{ secrets.SLACK_WEBHOOK_URL }}"
 
+      - name: Set end time
+        run: echo "END_TIME=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> $GITHUB_ENV
