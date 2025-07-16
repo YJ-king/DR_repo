@@ -267,7 +267,7 @@ jobs:
 
       - name: Wait for RDS restore job to complete
         run: |
-        kubectl wait --for=condition=complete job/restore-job --timeout=300s
+          kubectl wait --for=condition=complete job/restore-job --timeout=300s
 
       - name: Save RDS restore complete time
         run: echo "RDS_RESTORE_COMPLETE_TIME=$(date -u +"%Y-%m-%dT%H:%M:%SZ")" >> $GITHUB_ENV
@@ -279,8 +279,8 @@ jobs:
 
       - name: Wait for WAS pod to be ready
         run: |
-        kubectl wait --for=condition=Ready pod -l app=was --timeout=300s
-        echo "WAS_READY_TIME=$(date -u +"%Y-%m-%dT%H:%M:%SZ")" >> $GITHUB_ENV
+          kubectl wait --for=condition=Ready pod -l app=was --timeout=300s
+          echo "WAS_READY_TIME=$(date -u +"%Y-%m-%dT%H:%M:%SZ")" >> $GITHUB_ENV
 
       - name: Install Google BigQuery SDK
         run: pip install --upgrade google-cloud-bigquery
