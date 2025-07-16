@@ -24,7 +24,7 @@ status = os.environ.get("STATUS", "success")
 # [2] BigQuery 연결 설정
 project_id = "kdt1-finalproject"  # GCP 프로젝트 ID
 dataset_id = "DR_analysis"
-table_id = "dr_recovery_logs"
+table_id = "dr_recovery_log"
 table_ref = f"{project_id}.{dataset_id}.{table_id}"
 
 credentials = service_account.Credentials.from_service_account_file(temp_file_path)
