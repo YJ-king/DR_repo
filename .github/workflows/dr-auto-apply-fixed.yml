@@ -294,6 +294,18 @@ jobs:
 
       - name: Install Google BigQuery SDK
         run: pip install --upgrade google-cloud-bigquery
+     
+      - name: Debug Slack Approve Time
+        run: |
+          echo "🧪 TRIGGER_ID=$TRIGGER_ID"
+          echo "🧪 SLACK_APPROVE_TIME=$SLACK_APPROVE_TIME"
+          echo "🧪 START_TIME=$START_TIME"
+          echo "🧪 END_TIME=$END_TIME"
+        env:
+          TRIGGER_ID: dr-${{ github.run_number }}
+          SLACK_APPROVE_TIME: ${{ github.event.inputs.approve_time }}
+          START_TIME: ${{ env.START_TIME }}
+          END_TIME: ${{ env.END_TIME }}
 
       - name: Export to BigQuery
         env:
