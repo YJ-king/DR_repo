@@ -15,7 +15,7 @@ with tempfile.NamedTemporaryFile(mode='w', delete=False) as temp_file:
 trigger_id = os.environ.get("TRIGGER_ID")
 approve_time = os.environ.get("SLACK_APPROVE_TIME")
 start_time = os.environ.get("START_TIME")
-end_time = os.environ.get("END_TIME")
+terraform_end_time = os.environ.get("TERRAFORM_END_TIME")
 rds_restore_complete_time = os.environ.get("RDS_RESTORE_COMPLETE_TIME")
 was_ready_time = os.environ.get("WAS_READY_TIME")
 status = os.environ.get("STATUS", "success")
@@ -34,9 +34,9 @@ row = [{
     "trigger_id": trigger_id,
     "slack_approve_time": approve_time or None,
     "action_start_time": start_time or None,
+    "terraform_end_time": terraform_end_time or None,
     "rds_restore_complete_time": rds_restore_complete_time or None,
     "was_ready_time": was_ready_time or None,
-    "action_end_time": end_time or None,
     "status": status
 }]
 

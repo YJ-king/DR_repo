@@ -36,6 +36,9 @@ jobs:
       - name: Terraform Apply
         run: terraform -chdir=infra/dr_terraform/envs apply -auto-approve
 
+      - name: Set Terraform end time
+        run: echo "TERRAFORM_END_TIME=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> $GITHUB_ENV
+
       - name: Install dependencies (kubectl, awscli, helm)
         run: |
           sudo apt-get update -y
@@ -309,5 +312,3 @@ jobs:
             --data '{"text":"❌ DR 복구 중 오류가 발생했습니다."}' \
             "${{ secrets.SLACK_WEBHOOK_URL }}"
 
-      - name: Set end time
-        run: echo "END_TIME=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> $GITHUB_ENV
