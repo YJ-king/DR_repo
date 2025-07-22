@@ -3,12 +3,14 @@ kind: Ingress
 metadata:
   name: petclinic-ingress
   annotations:
-    kubernetes.io/ingress.class: "alb"  # ✅ ALB Controller용 IngressClass
+    kubernetes.io/ingress.class: "alb"
     alb.ingress.kubernetes.io/scheme: internet-facing
     alb.ingress.kubernetes.io/target-type: ip
-    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}]'
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS": 443}]'
+    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:ap-northeast-2:723165663216:certificate/f32cbc31-eeea-494d-8953-4642cedfe3bd
+    alb.ingress.kubernetes.io/ssl-redirect: '443'
 spec:
-  ingressClassName: alb  # ✅ ALB IngressClass 명시
+  ingressClassName: alb
   rules:
   - host: www.yjking.shop
     http:
@@ -20,4 +22,7 @@ spec:
             name: web-service
             port:
               number: 80
-
+  tls:
+  - hosts:
+      - www.yjking.shop
+    secretName: dummy-tls-secret
